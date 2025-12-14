@@ -22,7 +22,7 @@ jobs:
 
       - name: Install pybag
         run: |
-          pip install pybag
+          pip install pybag --no-deps
 
       - name: Build web version
         run: |
