@@ -1,3 +1,4 @@
+import asyncio
 import pygame
 import math
 from queue import PriorityQueue
@@ -189,7 +190,7 @@ def get_clicked_pos(pos, rows, width):
     return row, col
 
 
-def main(win, width):
+async def main(win, width):
     ROWS = 80
     grid = make_grid(ROWS, width)
 
@@ -197,6 +198,8 @@ def main(win, width):
     end = None
 
     run = True
+    clock = pygame.time.Clock()
+    
     while run:
         draw(win, grid, ROWS, width)
         for event in pygame.event.get():
@@ -241,7 +244,11 @@ def main(win, width):
                     end = None
                     grid = make_grid(ROWS, width)
 
+        clock.tick(60)
+        await asyncio.sleep(0)  # CRITICAL: Required for web browser
+
     pygame.quit()
 
 
-main(WIN, WIDTH)
+# Run the async main function
+asyncio.run(main(WIN, WIDTH))

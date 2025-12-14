@@ -1,0 +1,30 @@
+name: Build pygame-web (WASM)
+
+on:
+  push:
+    branches:
+      - main
+      - pybag
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Build using pygame-web Docker
+        run: |
+          docker run --rm \
+            -v "$PWD:/app" \
+            -w /app \
+            ghcr.io/pygame-web/pybag \
+            pybag build --web
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pygame-web-build
+          path: build/
