@@ -24,6 +24,15 @@ jobs:
         run: |
           pip install pybag --no-deps
 
+      - name: Patch pybag winreg import
+        run: |
+          PYBAG_DIR=$(python - <<EOF
+          import pybag, os
+          print(os.path.dirname(pybag.__file__))
+          EOF
+          )
+          sed -i 's/^import winreg$/if False:\\n    import winreg/' "$PYBAG_DIR/__init__.py"
+
       - name: Build web version
         run: |
           python -m pybag build --web
