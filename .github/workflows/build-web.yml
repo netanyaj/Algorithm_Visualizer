@@ -3,8 +3,8 @@ name: Build pygame-web (WASM)
 on:
   push:
     branches:
-      -main
-      -pybag
+      - main
+      - pybag
   workflow_dispatch:
 
 jobs:
