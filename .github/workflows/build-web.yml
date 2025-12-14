@@ -24,7 +24,7 @@ jobs:
         run: |
           pip install pybag --no-deps
 
-      - name: Patch pybag winreg import (robust)
+      - name: Patch pybag (remove Windows-only code)
         run: |
           SITE_PACKAGES=$(python - <<EOF
           import site
@@ -35,13 +35,13 @@ jobs:
           PYBAG_INIT="$SITE_PACKAGES/pybag/__init__.py"
 
           echo "Before patch:"
-          sed -n '1,20p' "$PYBAG_INIT"
+          sed -n '1,120p' "$PYBAG_INIT"
 
-          # Comment out any winreg import
-          sed -i '/winreg/s/^/# /' "$PYBAG_INIT"
+          # Remove Windows-only registry block safely
+          sed -i '/winreg/,/PackageRepository/d' "$PYBAG_INIT"
 
           echo "After patch:"
-          sed -n '1,20p' "$PYBAG_INIT"
+          sed -n '1,120p' "$PYBAG_INIT"
 
       - name: Build web version
         run: |
