@@ -24,7 +24,7 @@ jobs:
         run: |
           pip install pybag --no-deps
 
-      - name: Patch pybag winreg no import
+      - name: Patch pybag winreg import (robust)
         run: |
           SITE_PACKAGES=$(python - <<EOF
           import site
@@ -34,9 +34,14 @@ jobs:
 
           PYBAG_INIT="$SITE_PACKAGES/pybag/__init__.py"
 
-          echo "Patching $PYBAG_INIT"
+          echo "Before patch:"
+          sed -n '1,20p' "$PYBAG_INIT"
 
-          sed -i 's/^import winreg$/if False:\\n    import winreg/' "$PYBAG_INIT"
+          # Comment out any winreg import
+          sed -i '/winreg/s/^/# /' "$PYBAG_INIT"
+
+          echo "After patch:"
+          sed -n '1,20p' "$PYBAG_INIT"
 
       - name: Build web version
         run: |
