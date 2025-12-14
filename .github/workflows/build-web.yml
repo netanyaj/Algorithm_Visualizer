@@ -2,9 +2,7 @@ name: Build pygame-web (WASM)
 
 on:
   push:
-    branches:
-      - main
-      - pybag
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -15,37 +13,13 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.10"
-
-      - name: Install pybag
+      - name: Build using pygame-web Docker
         run: |
-          pip install pybag --no-deps
-
-      - name: Patch pybag (remove Windows-only code)
-        run: |
-          SITE_PACKAGES=$(python - <<EOF
-          import site
-          print(site.getsitepackages()[0])
-          EOF
-          )
-
-          PYBAG_INIT="$SITE_PACKAGES/pybag/__init__.py"
-
-          echo "Before patch:"
-          sed -n '1,120p' "$PYBAG_INIT"
-
-          # Remove Windows-only registry block safely
-          sed -i '/winreg/,/PackageRepository/d' "$PYBAG_INIT"
-
-          echo "After patch:"
-          sed -n '1,120p' "$PYBAG_INIT"
-
-      - name: Build web version
-        run: |
-          python -m pybag build --web
+          docker run --rm \
+            -v "$PWD:/app" \
+            -w /app \
+            ghcr.io/pygame-web/pybag \
+            pybag build --web
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
